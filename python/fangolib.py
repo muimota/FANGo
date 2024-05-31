@@ -201,3 +201,11 @@ def getRunningActivity():
         return r.groups()
     else:
         return None
+
+def killApp(packageId=None):
+    """Stops Activity, if no package is defined will kill the running activity"""
+    if packageId == None:
+        (packageId,activityId) = getRunningActivity()
+         
+    sendAdb('am force-stop ' + packageId)
+    
