@@ -6,6 +6,8 @@ import re
 from time import sleep
 import xml.etree.ElementTree as ET
 import random
+from PIL import Image
+from io import BytesIO
 
 
 class FangoException(Exception):
@@ -152,12 +154,16 @@ def unlock(PIN = None):
         insertText(PIN)
         pressKey(66)
 
-def screenshot(filename):
-    img = sendAdb('screencap -p',binary=True)
+def screenshot(filename=None,cropArea=None):
+    imgData = sendAdb('screencap -p',binary=True)
+    img = Image.open(BytesIO(imgData))
+    img = img.convert("RGB")
+    if cropArea:
+        img = img.crop(cropArea)
     #https://blog.shvetsov.com/2013/02/grab-android-screenshot-to-computer-via.html
-    #img = img.replace(b'\r\n',b'\n')
-    with open(filename,'wb') as f:
-        f.write(img)
+    if filename:
+        img.save(filename)
+    return img 
 
 def getContainers(x,y,xmlElements):
     """get nodes that contains certain coordinates x,y usefull to find elements"""
